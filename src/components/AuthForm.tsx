@@ -30,9 +30,7 @@ export default function AuthForm({ type }: AuthFormProps) {
         : await signup(email, password, name, role);
 
       if (authError) throw authError;
-      
-      // Explicitly redirect for speed
-      router.push('/dashboard');
+      // Redirect is now handled in AuthContext for better state synchronization
     } catch (err: any) {
       setError(err.message);
       setLoading(false);

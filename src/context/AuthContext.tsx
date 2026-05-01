@@ -69,7 +69,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error) router.push('/dashboard');
+    if (!error && data.user) {
+      await fetchProfile(data.user.id);
+      window.location.href = '/dashboard';
+    }
     return { error };
   };
 
@@ -83,9 +86,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .insert([{ id: data.user.id, name, email, role }]);
       
       if (profileError) return { error: profileError };
+      
+      await fetchProfile(data.user.id);
+      window.location.href = '/dashboard';
     }
 
-    if (!error) router.push('/dashboard');
     return { error };
   };
 
