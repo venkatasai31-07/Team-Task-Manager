@@ -17,22 +17,25 @@ export async function GET(req: NextRequest) {
 
     const userId = user.id;
 
-    // Get project IDs where user is involved
-    const { data: projectMembers, error: pmError } = await supabase
-      .from('project_members')
-      .select('project_id')
-      .eq('user_id', userId);
+    // Parallel Fetching for maximum speed
+    const [ { data: projectMembers }, { data: profile } ] = await Promise.all([
+      supabase.from('project_members').select('project_id').eq('user_id', userId),
+      supabase.from('profiles').select('role').eq('id', userId).single()
+    ]);
     
-    if (pmError) throw pmError;
+    if (!projectMembers) throw new Error('Failed to fetch project members');
     const projectIds = projectMembers.map(pm => pm.project_id);
 
-    // Get all tasks for these projects
-    const { data: allTasks, error: tError } = await supabase
-      .from('tasks')
-      .select('*')
-      .in('project_id', projectIds);
-    
-    if (tError) throw tError;
+    // Fetch tasks and system users (if admin) in parallel
+    const [ { data: allTasks }, systemUsersData ] = await Promise.all([
+      supabase.from('tasks').select('*').in('project_id', projectIds),
+      profile?.role === 'Admin' 
+        ? supabase.from('profiles').select('id, name, email, role') 
+        : Promise.resolve({ data: [] })
+    ]);
+
+    if (!allTasks) throw new Error('Failed to fetch tasks');
+    const allSystemUsers = systemUsersData.data || [];
 
     const totalTasks = allTasks.length;
     const tasksByStatus = {
@@ -63,20 +66,12 @@ export async function GET(req: NextRequest) {
       count: tasksPerUser[u.id]
     }));
 
-    // If user is Admin, we should also return a list of ALL users in the system
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', userId).single();
-    let allSystemUsers: any[] = [];
-    if (profile?.role === 'Admin') {
-      const { data: allUsers } = await supabase.from('profiles').select('id, name, email, role');
-      allSystemUsers = allUsers || [];
-    }
-
     return NextResponse.json({
       totalTasks,
       tasksByStatus,
       overdueTasks,
       tasksPerUser: tasksPerUserName,
-      allSystemUsers, // New field for Admin Console
+      allSystemUsers,
       recentTasks: allTasks.slice(0, 5).map(t => ({
         id: t.id,
         title: t.title,

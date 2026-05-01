@@ -61,19 +61,48 @@ export default function ProjectsPage() {
       {loading ? (
         <div className="text-gray-900">Loading projects...</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project) => (
-            <Link key={project.id} href={`/projects/${project.id}`}>
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md border border-gray-100 transition">
-                <h3 className="text-xl font-bold text-gray-900">{project.name}</h3>
-                <p className="text-gray-600 mt-2 line-clamp-2">{project.description || 'No description'}</p>
-                <div className="mt-4 flex items-center text-sm text-gray-500">
-                  <span className="bg-gray-100 px-2 py-1 rounded mr-2">Admin: {project.admin?.name || 'Unknown'}</span>
+            <Link key={project.id} href={`/projects/${project.id}`} className="group">
+              <div className="bg-white p-7 rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden group">
+                {/* Left Accent Border */}
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-indigo-600 transition-all duration-300 group-hover:w-2"></div>
+                
+                <h3 className="text-xl font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
+                  {project.name}
+                </h3>
+                <p className="text-slate-500 mt-3 line-clamp-2 text-sm leading-relaxed font-medium">
+                  {project.description || 'No description provided for this project.'}
+                </p>
+                <div className="mt-6 flex items-center justify-between border-t border-slate-50 pt-5">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-[10px]">
+                      {project.admin?.name?.[0] || 'A'}
+                    </div>
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                      Admin: {project.admin?.name || 'Unknown'}
+                    </span>
+                  </div>
+                  <div className="text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </Link>
           ))}
-          {projects.length === 0 && <p className="text-gray-600">No projects found. Create one to get started!</p>}
+          {projects.length === 0 && (
+            <div className="col-span-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-20 text-center">
+              <div className="w-20 h-20 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className="text-slate-500 font-bold text-lg">No projects found.</p>
+              <p className="text-slate-400 text-sm mt-1">Start by creating your first collaborative workspace.</p>
+            </div>
+          )}
         </div>
       )}
 
