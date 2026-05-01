@@ -63,11 +63,26 @@ export async function GET(req: NextRequest) {
       count: tasksPerUser[u.id]
     }));
 
+    // If user is Admin, we should also return a list of ALL users in the system
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', userId).single();
+    let allSystemUsers: any[] = [];
+    if (profile?.role === 'Admin') {
+      const { data: allUsers } = await supabase.from('profiles').select('id, name, email, role');
+      allSystemUsers = allUsers || [];
+    }
+
     return NextResponse.json({
       totalTasks,
       tasksByStatus,
       overdueTasks,
-      tasksPerUser: tasksPerUserName
+      tasksPerUser: tasksPerUserName,
+      allSystemUsers, // New field for Admin Console
+      recentTasks: allTasks.slice(0, 5).map(t => ({
+        id: t.id,
+        title: t.title,
+        status: t.status,
+        project_id: t.project_id
+      }))
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

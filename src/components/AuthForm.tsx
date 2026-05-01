@@ -82,15 +82,25 @@ export default function AuthForm({ type }: AuthFormProps) {
         {type === 'signup' && (
           <div className="flex flex-col space-y-2">
              <label className="text-sm font-semibold text-gray-700">Select Your Role:</label>
-             <select 
-               value={role} 
-               onChange={(e) => setRole(e.target.value)}
-               className="block w-full px-3 py-2 text-gray-900 border border-gray-300 bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm appearance-none"
-             >
-               <option value="Member">Member</option>
-               <option value="Admin">Admin</option>
-             </select>
-             <p className="text-[10px] text-gray-500">Admins can create projects and tasks.</p>
+             <div className="flex p-1 bg-gray-100 rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => setRole('Member')}
+                  className={`flex-1 py-2 text-sm font-bold rounded-md transition ${role === 'Member' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Member
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole('Admin')}
+                  className={`flex-1 py-2 text-sm font-bold rounded-md transition ${role === 'Admin' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Admin
+                </button>
+             </div>
+             <p className="text-[10px] text-gray-500 italic">
+               {role === 'Admin' ? 'Admins can create projects and manage teams.' : 'Members work on assigned tasks.'}
+             </p>
           </div>
         )}
 

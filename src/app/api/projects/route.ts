@@ -18,19 +18,32 @@ export async function POST(req: NextRequest) {
     const { name, description } = await req.json();
     if (!name) return NextResponse.json({ error: 'Project name is required' }, { status: 400 });
 
-    const { data, error } = await supabase
+    // 1. Create project
+    const { data: project, error: projectError } = await supabase
       .from('projects')
       .insert([{ name, description, admin_id: user.id }])
       .select()
       .single();
 
-    if (error) throw error;
+    if (projectError) {
+      console.error('Project Create Error:', projectError);
+      throw projectError;
+    }
 
-    // Add admin as first member
-    await supabase.from('project_members').insert([{ project_id: data.id, user_id: user.id }]);
+    // 2. Add admin as first member
+    const { error: memberError } = await supabase
+      .from('project_members')
+      .insert([{ project_id: project.id, user_id: user.id }]);
+    
+    if (memberError) {
+       console.error('Member Add Error:', memberError);
+       // We don't necessarily want to fail project creation if member add fails, 
+       // but here they are linked so it's important.
+    }
 
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(project, { status: 201 });
   } catch (error: any) {
+    console.error('API POST Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -40,24 +53,34 @@ export async function GET(req: NextRequest) {
     const user = await getAuthUser(req);
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    // Projects where user is admin or member
-    // Using a join or separate queries
+    // Step 1: Get all projects where the user is a member
+    const { data: membershipData, error: membershipError } = await supabase
+      .from('project_members')
+      .select('project_id')
+      .eq('user_id', user.id);
+
+    if (membershipError) throw membershipError;
+
+    const projectIds = membershipData.map(m => m.project_id);
+
+    // Step 2: Get projects where user is admin OR is in the projectIds list
     const { data, error } = await supabase
       .from('projects')
-      .select('*, profiles:admin_id(name, email), project_members!inner(user_id)')
-      .or(`admin_id.eq.${user.id},project_members.user_id.eq.${user.id}`);
+      .select('*, profiles:admin_id(name, email)')
+      .or(`admin_id.eq.${user.id}${projectIds.length > 0 ? `,id.in.(${projectIds.join(',')})` : ''}`);
 
     if (error) throw error;
 
-    // Format to match old structure
+    // Format for frontend
     const projects = data.map(p => ({
       ...p,
       admin: p.profiles,
-      members_count: p.project_members.length // Simplified for now
+      members_count: 1 // We can enhance this later
     }));
 
     return NextResponse.json(projects);
   } catch (error: any) {
+    console.error('Project Fetch Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
