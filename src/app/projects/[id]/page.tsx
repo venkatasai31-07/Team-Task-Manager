@@ -90,8 +90,8 @@ export default function ProjectDetailPage() {
     <DashboardLayout>
       <div className="flex justify-between items-start mb-8">
         <div>
-          <h1 className="text-3xl font-bold">{project.name}</h1>
-          <p className="text-gray-500 mt-2">{project.description}</p>
+          <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
+          <p className="text-gray-600 mt-2">{project.description}</p>
         </div>
         {isAdmin && (
           <button 
@@ -125,33 +125,35 @@ export default function ProjectDetailPage() {
       {showTaskModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl p-8 max-w-md w-full shadow-2xl">
-            <h2 className="text-2xl font-bold mb-4">Create New Task</h2>
+            <h2 className="text-2xl font-bold mb-4 text-gray-900">Create New Task</h2>
             <form onSubmit={handleCreateTask} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Title</label>
+                <label className="block text-sm font-semibold text-gray-800">Title</label>
                 <input 
                   type="text" 
                   required
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Task title"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
                   value={taskTitle}
                   onChange={(e) => setTaskTitle(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <label className="block text-sm font-semibold text-gray-800">Description</label>
                 <textarea 
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  placeholder="What needs to be done?"
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-gray-900 focus:ring-indigo-500 focus:border-indigo-500"
                   value={taskDesc}
                   onChange={(e) => setTaskDesc(e.target.value)}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Priority</label>
+                  <label className="block text-sm font-semibold text-gray-800">Priority</label>
                   <select 
                     value={taskPriority} 
                     onChange={(e) => setTaskPriority(e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-900 bg-white"
                   >
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
@@ -159,21 +161,21 @@ export default function ProjectDetailPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Due Date</label>
+                  <label className="block text-sm font-semibold text-gray-800">Due Date</label>
                   <input 
                     type="date" 
-                    className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                    className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-900 bg-white"
                     value={taskDueDate}
                     onChange={(e) => setTaskDueDate(e.target.value)}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Assign To</label>
+                <label className="block text-sm font-semibold text-gray-800">Assign To</label>
                 <select 
                   value={taskAssignedTo} 
                   onChange={(e) => setTaskAssignedTo(e.target.value)}
-                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-gray-900 bg-white"
                 >
                   <option value="">Unassigned</option>
                   {project.members?.map((m: any) => (
