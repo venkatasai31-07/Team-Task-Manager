@@ -62,9 +62,4 @@ TaskFlow is a collaborative platform designed for efficient team project managem
 Connect your GitHub repository to **Railway** and add the Supabase environment variables in the dashboard for automatic deployment.
 
 ---
-
-## 🎥 Demonstration
-[Click here to watch the Demo Video] (Replace this with your link)
-
----
 Built for the Ethara AI Full-Stack Assessment.
