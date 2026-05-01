@@ -1,60 +1,77 @@
-# Team Task Manager (Full-Stack)
+# 💎 TaskFlow: Ultra-Premium Team Task Manager
 
-A real-world collaborative application where users can manage projects and tasks efficiently with role-based access control.
+TaskFlow is a production-grade, full-stack collaborative platform designed for high-performance teams. Built with a focus on **Ultra-Premium Aesthetics** and **Robust Security**, it allows organizations to manage projects and tasks with granular control.
 
-## 🚀 Features
-- **User Authentication**: Secure Signup/Login with JWT.
-- **Project Management**: Create projects, add/remove members (Admin only).
-- **Task Management**: Create, assign, and track tasks (Title, Description, Due Date, Priority, Status).
+---
+
+## ✨ Features
+
+### 🎨 Ultra-Premium Experience
+- **Glassmorphism Design**: Frosted glass interfaces with deep-space indigo gradients.
+- **Dynamic Dashboard**: Real-time analytics with glowing stat cards and hover-lift effects.
+- **Responsive Layout**: Seamless experience across mobile, tablet, and desktop.
+
+### 🛡️ Secure Auth & RBAC
+- **One-Click Login**: Optimized session handling for instant access.
 - **Role-Based Access Control**:
-  - **Admin**: Can manage all tasks and users within their projects.
-  - **Member**: Can view projects and update the status of tasks assigned to them.
-- **Dashboard**: Real-time stats for Total Tasks, Tasks by Status, Overdue Tasks, and Tasks per User.
+  - **Admin**: Full system oversight, project creation, and user management.
+  - **Member**: Focused workspace for assigned tasks and collaboration.
+
+### 🛠️ Core Functionality
+- **Project Boards**: Intuitive Kanban-style task management.
+- **Admin Console**: Global user management with role toggling and account deletion.
+- **Real-time Analytics**: Live tracking of overdue tasks, team workload, and project health.
+
+---
 
 ## 🛠️ Tech Stack
-- **Frontend**: Next.js 14 (App Router), React, Tailwind CSS.
-- **Backend**: Next.js API Routes (Node.js).
-- **Database**: MongoDB (via Mongoose).
-- **Authentication**: JWT & Bcrypt.
-- **Deployment**: Railway.
 
-## 📦 Setup Instructions
+- **Frontend**: Next.js 13.5 (App Router), React 18
+- **Styling**: Tailwind CSS (Premium Theme)
+- **Backend**: Next.js API Routes (Serverless)
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth (SSR Optimized)
+- **Deployment**: Railway
 
-1. **Clone the repository**:
+---
+
+## 📦 Setup & Installation
+
+1. **Clone & Install**:
    ```bash
-   git clone <your-repo-link>
+   git clone https://github.com/venkatasai31-07/Team-Task-Manager.git
    cd team-task-manager
-   ```
-
-2. **Install dependencies**:
-   ```bash
    npm install
    ```
 
-3. **Environment Variables**:
-   Create a `.env.local` file in the root and add:
+2. **Environment Configuration**:
+   Create a `.env.local` file in the root:
    ```env
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
-4. **Run the development server**:
+3. **Development Mode**:
    ```bash
    npm run dev
    ```
 
-5. **Open the app**:
-   Visit `http://localhost:3000`.
+4. **Production Build**:
+   ```bash
+   npm run build
+   npm start
+   ```
 
-## 🌐 Deployment on Railway
+---
 
-1. Push the code to a GitHub repository.
-2. Link the repository to your [Railway](https://railway.app/) account.
-3. Add the `MONGODB_URI` and `JWT_SECRET` environment variables in the Railway dashboard.
-4. Railway will automatically detect the Next.js app and deploy it.
+## 🌐 Deployment
 
-## 🎥 Demo Video
+The application is optimized for **Railway**. Simply connect your GitHub repository and ensure your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` variables are added to the Railway dashboard.
+
+---
+
+## 🎥 Demonstration
 [Link to Demo Video] (Upload your video and replace this link)
 
 ---
-Built for the Ethara AI Full-Stack Assessment.
+Built for the Ethara AI Full-Stack Assessment with 💎 Ultra-Premium Design Standards.
