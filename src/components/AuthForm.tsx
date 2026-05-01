@@ -3,12 +3,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface AuthFormProps {
   type: 'login' | 'signup';
 }
 
 export default function AuthForm({ type }: AuthFormProps) {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -28,9 +30,11 @@ export default function AuthForm({ type }: AuthFormProps) {
         : await signup(email, password, name, role);
 
       if (authError) throw authError;
+      
+      // Explicitly redirect for speed
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
