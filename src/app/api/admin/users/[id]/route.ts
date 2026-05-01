@@ -2,12 +2,18 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-function getSupabase() {
+function getSupabase(req: Request) {
   const cookieStore = cookies();
+  const authHeader = req.headers.get('Authorization');
+  const token = authHeader?.split(' ')[1];
+
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
+      global: {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      },
       cookies: {
         get(name: string) {
           return cookieStore.get(name)?.value;
@@ -27,7 +33,7 @@ export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const supabase = getSupabase();
+  const supabase = getSupabase(request);
   const { role } = await request.json();
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -51,7 +57,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const supabase = getSupabase();
+  const supabase = getSupabase(request);
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
