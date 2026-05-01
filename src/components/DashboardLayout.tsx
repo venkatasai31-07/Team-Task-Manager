@@ -3,14 +3,21 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const { user, logout, loading } = useAuth();
   const pathname = usePathname();
 
-  if (loading) return <div>Loading...</div>;
-  if (!user) return null; // Should be handled by middleware or redirect in useEffect
+  React.useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading) return <div className="p-8 text-indigo-600 font-bold">Loading...</div>;
+  if (!user) return null;
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard' },
