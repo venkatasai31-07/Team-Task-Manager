@@ -80,16 +80,17 @@ export default function AuthForm({ type }: AuthFormProps) {
         </div>
 
         {type === 'signup' && (
-          <div className="flex items-center space-x-4">
-             <label className="text-sm font-medium text-gray-700">Initial Role:</label>
+          <div className="flex flex-col space-y-2">
+             <label className="text-sm font-semibold text-gray-700">Select Your Role:</label>
              <select 
                value={role} 
                onChange={(e) => setRole(e.target.value)}
-               className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+               className="block w-full px-3 py-2 text-gray-900 border border-gray-300 bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md shadow-sm appearance-none"
              >
                <option value="Member">Member</option>
                <option value="Admin">Admin</option>
              </select>
+             <p className="text-[10px] text-gray-500">Admins can create projects and tasks.</p>
           </div>
         )}
 

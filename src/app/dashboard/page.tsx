@@ -7,12 +7,12 @@ import { useAuth } from '@/context/AuthContext';
 export default function DashboardPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { token } = useAuth();
+  const { session } = useAuth();
 
   useEffect(() => {
-    if (token) {
+    if (session?.access_token) {
       fetch('/api/dashboard', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
       })
       .then(res => res.json())
       .then(data => {
@@ -20,9 +20,9 @@ export default function DashboardPage() {
         setLoading(false);
       });
     }
-  }, [token]);
+  }, [session]);
 
-  if (loading) return <DashboardLayout><div>Loading stats...</div></DashboardLayout>;
+  if (loading) return <DashboardLayout><div className="text-gray-900 font-bold">Loading stats...</div></DashboardLayout>;
 
   return (
     <DashboardLayout>
