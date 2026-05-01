@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/components/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -11,19 +12,19 @@ export default function ProjectsPage() {
   const [showModal, setShowModal] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const { token } = useAuth();
+  const { session } = useAuth();
 
   useEffect(() => {
     fetchProjects();
-  }, [token]);
+  }, [session]);
 
   const fetchProjects = async () => {
-    if (!token) return;
+    if (!session) return;
     const res = await fetch('/api/projects', {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization': `Bearer ${session.access_token}` }
     });
     const data = await res.json();
-    setProjects(data);
+    if (Array.isArray(data)) setProjects(data);
     setLoading(false);
   };
 
@@ -32,7 +33,7 @@ export default function ProjectsPage() {
     const res = await fetch('/api/projects', {
       method: 'POST',
       headers: { 
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${session.access_token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ name, description })
@@ -62,13 +63,12 @@ export default function ProjectsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project) => (
-            <Link key={project._id} href={`/projects/${project._id}`}>
+            <Link key={project.id} href={`/projects/${project.id}`}>
               <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md border border-gray-100 transition">
                 <h3 className="text-xl font-bold text-gray-900">{project.name}</h3>
                 <p className="text-gray-500 mt-2 line-clamp-2">{project.description || 'No description'}</p>
                 <div className="mt-4 flex items-center text-sm text-gray-400">
-                  <span className="bg-gray-100 px-2 py-1 rounded mr-2">Admin: {project.admin.name}</span>
-                  <span>{project.members.length} members</span>
+                  <span className="bg-gray-100 px-2 py-1 rounded mr-2">Admin: {project.admin?.name || 'Unknown'}</span>
                 </div>
               </div>
             </Link>

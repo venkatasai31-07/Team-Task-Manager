@@ -1,33 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import Project from '@/models/Project';
-import { getAuthUser } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
+
+async function getAuthUser(req: NextRequest) {
+  const authHeader = req.headers.get('authorization');
+  if (!authHeader) return null;
+  const token = authHeader.split(' ')[1];
+  const { data: { user }, error } = await supabase.auth.getUser(token);
+  if (error || !user) return null;
+  return user;
+}
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect();
-    const userPayload = await getAuthUser(req);
-    if (!userPayload) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const user = await getAuthUser(req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const project = await Project.findById(params.id)
-      .populate('admin', 'name email')
-      .populate('members', 'name email');
+    const { data: project, error } = await supabase
+      .from('projects')
+      .select('*, profiles:admin_id(name, email), project_members(profiles:user_id(id, name, email))')
+      .eq('id', params.id)
+      .single();
 
-    if (!project) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-    }
+    if (error || !project) return NextResponse.json({ error: 'Project not found' }, { status: 404 });
 
-    // Check if member
-    const isMember = project.members.some((m: any) => m._id.toString() === (userPayload as any).id) || 
-                     project.admin._id.toString() === (userPayload as any).id;
-    
-    if (!isMember) {
-      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
-    }
+    // Format
+    const formatted = {
+      ...project,
+      admin: project.profiles,
+      members: project.project_members.map((pm: any) => pm.profiles)
+    };
 
-    return NextResponse.json(project);
+    return NextResponse.json(formatted);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -35,29 +38,22 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect();
-    const userPayload = await getAuthUser(req);
-    if (!userPayload) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const user = await getAuthUser(req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const project = await Project.findById(params.id);
-    if (!project) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-    }
+    const { data: project } = await supabase.from('projects').select('admin_id').eq('id', params.id).single();
+    if (project?.admin_id !== user.id) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
 
-    // Only Admin can update project or add/remove members
-    if (project.admin.toString() !== (userPayload as any).id) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
+    const { name, description } = await req.json();
+    const { data, error } = await supabase
+      .from('projects')
+      .update({ name, description })
+      .eq('id', params.id)
+      .select()
+      .single();
 
-    const { name, description, members } = await req.json();
-    if (name) project.name = name;
-    if (description) project.description = description;
-    if (members) project.members = members;
-
-    await project.save();
-    return NextResponse.json(project);
+    if (error) throw error;
+    return NextResponse.json(data);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -65,22 +61,13 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await dbConnect();
-    const userPayload = await getAuthUser(req);
-    if (!userPayload) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const user = await getAuthUser(req);
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const project = await Project.findById(params.id);
-    if (!project) {
-      return NextResponse.json({ error: 'Project not found' }, { status: 404 });
-    }
+    const { data: project } = await supabase.from('projects').select('admin_id').eq('id', params.id).single();
+    if (project?.admin_id !== user.id) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
 
-    if (project.admin.toString() !== (userPayload as any).id) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
-
-    await Project.deleteOne({ _id: params.id });
+    await supabase.from('projects').delete().eq('id', params.id);
     return NextResponse.json({ message: 'Project deleted' });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

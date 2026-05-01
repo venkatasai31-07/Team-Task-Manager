@@ -15,7 +15,7 @@ export default function AuthForm({ type }: AuthFormProps) {
   const [role, setRole] = useState('Member');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, signup } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,19 +23,11 @@ export default function AuthForm({ type }: AuthFormProps) {
     setLoading(true);
 
     try {
-      const endpoint = type === 'login' ? '/api/auth/login' : '/api/auth/signup';
-      const body = type === 'login' ? { email, password } : { name, email, password, role };
+      const { error: authError } = type === 'login' 
+        ? await login(email, password) 
+        : await signup(email, password, name, role);
 
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Something went wrong');
-
-      login(data.token, data.user);
+      if (authError) throw authError;
     } catch (err: any) {
       setError(err.message);
     } finally {

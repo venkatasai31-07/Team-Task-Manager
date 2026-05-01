@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation';
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
-  const { token, user } = useAuth();
+  const { session, user } = useAuth();
   const [project, setProject] = useState<any>(null);
   const [tasks, setTasks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,15 +21,15 @@ export default function ProjectDetailPage() {
   const [taskAssignedTo, setTaskAssignedTo] = useState('');
 
   useEffect(() => {
-    if (token && id) {
+    if (session && id) {
       fetchProject();
       fetchTasks();
     }
-  }, [token, id]);
+  }, [session, id]);
 
   const fetchProject = async () => {
     const res = await fetch(`/api/projects/${id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization': `Bearer ${session.access_token}` }
     });
     const data = await res.json();
     setProject(data);
@@ -37,10 +37,10 @@ export default function ProjectDetailPage() {
 
   const fetchTasks = async () => {
     const res = await fetch(`/api/tasks?projectId=${id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { 'Authorization': `Bearer ${session.access_token}` }
     });
     const data = await res.json();
-    setTasks(data);
+    if (Array.isArray(data)) setTasks(data);
     setLoading(false);
   };
 
@@ -49,16 +49,16 @@ export default function ProjectDetailPage() {
     const res = await fetch('/api/tasks', {
       method: 'POST',
       headers: { 
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${session.access_token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ 
         title: taskTitle, 
         description: taskDesc, 
         priority: taskPriority, 
-        dueDate: taskDueDate, 
-        projectId: id,
-        assignedTo: taskAssignedTo || null
+        due_date: taskDueDate, 
+        project_id: id,
+        assigned_to: taskAssignedTo || null
       })
     });
     if (res.ok) {
@@ -73,7 +73,7 @@ export default function ProjectDetailPage() {
     const res = await fetch(`/api/tasks/${taskId}`, {
       method: 'PUT',
       headers: { 
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${session.access_token}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ status: newStatus })
@@ -84,7 +84,7 @@ export default function ProjectDetailPage() {
   if (loading) return <DashboardLayout><div>Loading project...</div></DashboardLayout>;
   if (!project) return <DashboardLayout><div>Project not found.</div></DashboardLayout>;
 
-  const isAdmin = project.admin._id === user?.id;
+  const isAdmin = project.admin_id === user?.id;
 
   return (
     <DashboardLayout>
@@ -104,7 +104,6 @@ export default function ProjectDetailPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Task Columns */}
         <TaskColumn 
           title="To Do" 
           tasks={tasks.filter(t => t.status === 'To Do')} 
@@ -177,8 +176,8 @@ export default function ProjectDetailPage() {
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                 >
                   <option value="">Unassigned</option>
-                  {project.members.map((m: any) => (
-                    <option key={m._id} value={m._id}>{m.name}</option>
+                  {project.members?.map((m: any) => (
+                    <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
                 </select>
               </div>
@@ -202,7 +201,7 @@ function TaskColumn({ title, tasks, onStatusChange }: { title: string, tasks: an
       </h3>
       <div className="space-y-4">
         {tasks.map(task => (
-          <div key={task._id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+          <div key={task.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
             <h4 className="font-bold text-gray-900">{task.title}</h4>
             <p className="text-xs text-gray-500 mt-1 line-clamp-2">{task.description}</p>
             <div className="mt-3 flex justify-between items-center">
@@ -213,17 +212,17 @@ function TaskColumn({ title, tasks, onStatusChange }: { title: string, tasks: an
                 {task.priority}
               </span>
               <span className="text-[10px] text-gray-400">
-                {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No date'}
+                {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'No date'}
               </span>
             </div>
             <div className="mt-3 pt-3 border-t border-gray-50 flex justify-between items-center">
                <span className="text-[10px] text-gray-500 italic">
-                 {task.assignedTo ? `Assigned to ${task.assignedTo.name}` : 'Unassigned'}
+                 {task.assigned_profile ? `Assigned to ${task.assigned_profile.name}` : 'Unassigned'}
                </span>
                <select 
                  className="text-[10px] border-none bg-gray-50 rounded p-1"
                  value={task.status}
-                 onChange={(e) => onStatusChange(task._id, e.target.value)}
+                 onChange={(e) => onStatusChange(task.id, e.target.value)}
                >
                  <option value="To Do">To Do</option>
                  <option value="In Progress">In Progress</option>
