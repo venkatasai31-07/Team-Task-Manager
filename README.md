@@ -1,36 +1,35 @@
-# 💎 TaskFlow: Ultra-Premium Team Task Manager
+# TaskFlow: Team Task Manager
 
-TaskFlow is a production-grade, full-stack collaborative platform designed for high-performance teams. Built with a focus on **Ultra-Premium Aesthetics** and **Robust Security**, it allows organizations to manage projects and tasks with granular control.
+TaskFlow is a collaborative platform designed for efficient team project management. It features a modern user interface, role-based access control, and real-time task tracking.
 
 ---
 
 ## ✨ Features
 
-### 🎨 Ultra-Premium Experience
-- **Glassmorphism Design**: Frosted glass interfaces with deep-space indigo gradients.
-- **Dynamic Dashboard**: Real-time analytics with glowing stat cards and hover-lift effects.
-- **Responsive Layout**: Seamless experience across mobile, tablet, and desktop.
+### 🎨 Modern Design
+- **Clean Interface**: Professional slate-themed UI with high-contrast layouts.
+- **Intuitive Dashboard**: At-a-glance analytics for team productivity.
+- **Responsive Layout**: Works seamlessly across desktop and mobile devices.
 
-### 🛡️ Secure Auth & RBAC
-- **One-Click Login**: Optimized session handling for instant access.
+### 🛡️ Security & Roles
 - **Role-Based Access Control**:
-  - **Admin**: Full system oversight, project creation, and user management.
-  - **Member**: Focused workspace for assigned tasks and collaboration.
+  - **Admin**: Full oversight, project management, and user controls.
+  - **Member**: Workspace for assigned tasks and collaboration.
+- **Secure Authentication**: Built with Supabase Auth for robust data protection.
 
 ### 🛠️ Core Functionality
-- **Project Boards**: Intuitive Kanban-style task management.
-- **Admin Console**: Global user management with role toggling and account deletion.
-- **Real-time Analytics**: Live tracking of overdue tasks, team workload, and project health.
+- **Project Kanban Boards**: Simple drag-and-drop workflow tracking.
+- **User Management**: Admin tools for role toggling and account management.
+- **Performance**: Parallel data fetching for fast page loads.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 13.5 (App Router), React 18
-- **Styling**: Tailwind CSS (Premium Theme)
-- **Backend**: Next.js API Routes (Serverless)
+- **Styling**: Tailwind CSS
 - **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth (SSR Optimized)
+- **Authentication**: Supabase Auth
 - **Deployment**: Railway
 
 ---
@@ -56,22 +55,16 @@ TaskFlow is a production-grade, full-stack collaborative platform designed for h
    npm run dev
    ```
 
-4. **Production Build**:
-   ```bash
-   npm run build
-   npm start
-   ```
-
 ---
 
 ## 🌐 Deployment
 
-The application is optimized for **Railway**. Simply connect your GitHub repository and ensure your `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` variables are added to the Railway dashboard.
+Connect your GitHub repository to **Railway** and add the Supabase environment variables in the dashboard for automatic deployment.
 
 ---
 
 ## 🎥 Demonstration
-[Link to Demo Video] (Upload your video and replace this link)
+[Click here to watch the Demo Video] (Replace this with your link)
 
 ---
-Built for the Ethara AI Full-Stack Assessment with 💎 Ultra-Premium Design Standards.
+Built for the Ethara AI Full-Stack Assessment.
